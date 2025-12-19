@@ -1,4 +1,4 @@
-from main import app
+from run import app
 import asyncio
 
 async def test_root_route():
