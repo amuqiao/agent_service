@@ -4,7 +4,35 @@ from app.schemas.agent import AgentRequest, AgentResponse
 
 router = APIRouter(prefix="/agent", tags=["agent"])
 
-@router.post("/query", response_model=AgentResponse)
+@router.post("/query", response_model=AgentResponse, 
+             openapi_extra={
+                 "requestBody": {
+                     "content": {
+                         "application/json": {
+                             "examples": {
+                                 "默认示例": {
+                                     "summary": "默认Agent查询示例",
+                                     "description": "使用默认检索器执行Agent查询",
+                                     "value": {
+                                         "query": "什么是RAG技术？",
+                                         "retriever_name": "langchain_rag",
+                                         "kwargs": {}
+                                     }
+                                 },
+                                 "自定义检索器示例": {
+                                     "summary": "使用自定义检索器执行查询",
+                                     "description": "指定检索器执行Agent查询",
+                                     "value": {
+                                         "query": "介绍一下FastAPI",
+                                         "retriever_name": "langchain_rag",
+                                         "kwargs": {"top_k": 3}
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                 }
+             })
 async def agent_query(
     request: AgentRequest,
     retrieval_service: RetrievalService = Depends()

@@ -1,0 +1,25 @@
+[project]
+name = "agent-service"
+version = "0.1.0"
+description = "基于FastAPI的MVC架构Agent服务，支持多种检索器配置"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.125.0",
+    "uvicorn>=0.30.0",
+    "pydantic-settings>=2.0.0",
+    "langchain-openai>=0.3.0",
+    "langchain-huggingface>=0.0.3",
+    "langchain-community>=0.3.0",
+    "langchain-classic>=0.0.52",
+    "chromadb>=0.5.0",
+    "huggingface-hub>=0.24.0",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.uv]
+index-url = "https://mirrors.aliyun.com/pypi/simple/"
+
+[build-system]
+requires = ["uv>=0.3"]
+build-backend = "uv.build"

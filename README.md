@@ -373,8 +373,8 @@ if __name__ == "__main__":
 ## 5. 技术栈
 
 - **框架**: FastAPI
-- **语言**: Python 3.10+
-- **依赖管理**: pip + requirements.txt
+- **语言**: Python 3.11+
+- **依赖管理**: uv + pyproject.toml
 - **数据库**: Chroma DB (向量数据库), Lance DB (图数据库)
 - **RAG框架**: LangChain, GraphRAG
 - **配置管理**: Pydantic Settings
@@ -411,6 +411,129 @@ if __name__ == "__main__":
 4. 支持多租户部署
 5. 实现更高级的检索策略（如检索器融合）
 6. 提供SDK支持多种编程语言调用
+
+## 10. 项目启动与接口使用
+
+### 10.1 环境变量配置
+
+创建 `.env` 文件，根据需要配置以下环境变量：
+
+```bash
+# LLM 配置
+MODEL=qwen-plus
+BASE_URL=https://api.example.com/v1
+API_KEY=your_api_key
+
+# 嵌入模型配置
+EMBED_MODEL_PATH=bge-large-zh-v1.5
+```
+
+### 10.2 依赖安装
+
+使用 uv 安装项目依赖：
+
+```bash
+uv pip install "fastapi>=0.125.0" "uvicorn>=0.30.0" "pydantic-settings>=2.0.0" "langchain-openai>=0.3.0" "langchain-huggingface>=0.0.3" "langchain-community>=0.3.0" "langchain-classic>=0.0.52" "chromadb>=0.5.0" "huggingface-hub>=0.24.0" "python-dotenv>=1.0.0"
+```
+
+### 10.3 项目启动
+
+#### 方式一：直接运行 main.py
+
+```bash
+python main.py
+```
+
+#### 方式二：使用 uvicorn 启动（推荐用于开发环境）
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+# 启动服务
+nohup uvicorn main:app --host 0.0.0.0 --port 8000 --reload > server.log 2>&1 & 
+```
+
+- `--reload`：启用热重载，代码修改后自动重启服务
+- `--host 0.0.0.0`：允许外部访问
+- `--port 8000`：指定服务端口
+
+### 10.4 接口使用示例
+
+#### 10.4.1 获取服务状态
+
+**请求**：
+```bash
+curl http://127.0.0.1:8000
+```
+
+**响应**：
+```json
+{
+  "message": "Agent Service is running",
+  "version": "1.0.0",
+  "retrievers": ["langchain_rag", "graphrag"]
+}
+```
+
+#### 10.4.2 列出可用检索器
+
+**请求**：
+```bash
+curl http://127.0.0.1:8000/api/v1/retrieval/retrievers
+```
+
+**响应**：
+```json
+{
+  "langchain_rag": "langchain_rag"
+}
+```
+
+#### 10.4.3 执行检索
+
+**请求**：
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"retriever_name": "langchain_rag", "query": "什么是RAG？"}' http://127.0.0.1:8000/api/v1/retrieval/query
+```
+
+**响应**：
+```json
+{
+  "query": "什么是RAG？",
+  "retriever": "langchain_rag",
+  "result": {
+    "answer": "RAG（Retrieval-Augmented Generation）是一种结合了检索和生成的AI技术，它通过从外部知识库检索相关信息，然后将这些信息作为上下文输入到生成模型中，生成更准确、更相关的回答。",
+    "sources": [
+      {
+        "source": "rag_docs.pdf",
+        "page": "1"
+      },
+      {
+        "source": "rag_overview.md",
+        "page": "3"
+      }
+    ]
+  }
+}
+```
+
+### 10.5 API文档
+
+服务启动后，可以通过以下地址访问自动生成的API文档：
+
+- **Swagger UI**：http://127.0.0.1:8000/docs
+- **ReDoc**：http://127.0.0.1:8000/redoc
+
+### 10.6 验证服务
+
+可以使用以下命令验证服务是否正常运行：
+
+```bash
+# 检查服务状态
+curl -s http://127.0.0.1:8000 | jq .
+
+# 检查可用检索器
+curl -s http://127.0.0.1:8000/api/v1/retrieval/retrievers | jq .
+```
 
 ---
 
